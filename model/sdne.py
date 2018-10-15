@@ -150,11 +150,11 @@ class SDNE:
         return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd +self.loss_xxx
 
     def save_model(self, path):
-        saver = tf.train.Saver(self.b.values() + self.w.values())
+        saver = tf.train.Saver()
         saver.save(self.sess, path)
 
     def restore_model(self, path):
-        saver = tf.train.Saver(self.b.values() + self.w.values())
+        saver = tf.train.Saver()
         saver.restore(self.sess, path)
         self.init = True
     
@@ -223,8 +223,9 @@ class SDNE:
                 embedding = None
                 while not graph.epoch_end:
                     mini_batch = graph.sample(batch_size)
+                    start = graph.start
                     loss = self.fit(mini_batch)
-                    self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6s"%(current_epoch, graph.start, graph.node_number, loss))
+                    self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6s"%(current_epoch, start, graph.node_number, loss))
                 model_path_epoch = model_path + ".%s"%str(current_epoch)
                 embedding_path_epoch = embedding_path + ".%s"%str(current_epoch)
                 self.save_model(model_path_epoch)
