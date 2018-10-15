@@ -1,0 +1,13 @@
+/sdne.log
+/__pycache__
+/basic/__pycache__
+/data/*.rar
+/data/*.zip
+/data/*.gz
+/data/Twitter
+/data/Arxi*
+/data/DBLPCitation
+/data/Web*
+/data/Wiki*
+/graph/__pycache__
+/model/__pycache__
