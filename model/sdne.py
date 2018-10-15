@@ -240,7 +240,7 @@ class SDNE:
                         embedding = self.get_embedding(mini_batch)
                     else:
                         embedding = np.vstack((embedding, self.get_embedding(mini_batch)))
-                io.savemat(embedding_path_epoch, embedding)
+                io.savemat(embedding_path_epoch, {"embedding"embedding})
                 self.logger("SDNE Epoch %3d Error: %5.6s"%(current_epoch, loss))
             else:
                 break
