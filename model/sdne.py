@@ -217,7 +217,7 @@ class SDNE:
         embedding_path   = self.config.embedding_path
         current_epoch    = 0
         while True:
-            if current_epoch <= self.config.epochs:
+            if current_epoch < self.config.epochs:
                 current_epoch += 1
                 loss = 0
                 embedding = None
