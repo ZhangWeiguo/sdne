@@ -221,25 +221,28 @@ class SDNE:
                 current_epoch += 1
                 loss = 0
                 embedding = None
-                while not graph.epoch_end:
+
+                while True:
                     start = graph.start
                     mini_batch = graph.sample(batch_size)
                     loss = self.fit(mini_batch)
                     self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6s"%(current_epoch, start, graph.node_number, loss))
+                    if graph.epoch_end:
+                        break
                 model_path_epoch = model_path + ".%s"%str(current_epoch)
                 embedding_path_epoch = embedding_path + ".%s"%str(current_epoch)
                 self.save_model(model_path_epoch)
 
                 loss = 0
-                mini_batch = graph.sample(batch_size, shuffle=False)
-                loss += self.get_loss(mini_batch)
-                while not graph.epoch_end:
+                while True:
                     mini_batch = graph.sample(batch_size, shuffle=False)
                     loss += self.get_loss(mini_batch)
                     if embedding is None:
                         embedding = self.get_embedding(mini_batch)
                     else:
                         embedding = np.vstack((embedding, self.get_embedding(mini_batch)))
+                    if graph.epoch_end:
+                        break
                 io.savemat(embedding_path_epoch, {"embedding":embedding})
                 self.logger("SDNE Epoch %3d Error: %5.6s"%(current_epoch, loss))
             else:
