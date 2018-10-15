@@ -30,3 +30,4 @@ if __name__ == "__main__":
     model = SDNE(config, logger=logger.info)
     # model.rbm_init(graph)
     model.train(graph)
+    model.save_model(config.model_path)

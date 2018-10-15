@@ -162,9 +162,10 @@ class SDNE:
         def assign(a, b):
             op = a.assign(b)
             self.sess.run(op)
+        self.logger("Init Para By RBM Model Begin")
         if os.path.exists(self.config.model_path):
-            self.restore_model(self.config.restore_model)
-            self.logger("Restore Model" + self.config.restore_model)
+            self.restore_model(self.config.model_path)
+            self.logger("Restore Model From " + self.config.model_path)
         else:
             shape = self.struct
             rbms = []
@@ -191,6 +192,7 @@ class SDNE:
                 assign(self.w[name], W.transpose())
                 assign(self.b[name], bv)
         self.init = True
+        self.logger("Init Para By RBM Model Done")
 
     def __get_feed_dict(self, data):
         x               = data.data
@@ -222,6 +224,7 @@ class SDNE:
                 while not graph.epoch_end:
                     mini_batch = graph.sample(batch_size)
                     loss = self.fit(mini_batch)
+                    self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6s"%(current_epoch, graph.start, graph.node_number, loss))
                 model_path_epoch = model_path + ".%s"%str(current_epoch)
                 embedding_path_epoch = embedding_path + ".%s"%str(current_epoch)
                 self.save_model(model_path_epoch)
