@@ -2,9 +2,11 @@
 
 import os
 import numpy
+import random
 from scipy.sparse import dok_matrix
 from scipy.sparse import csr_matrix
 from scipy import io
+from matplotlib import pyplot
 
 class MiniBatch(dict):
     def __init__(self):
@@ -33,6 +35,29 @@ class Graph:
         if (os.path.exists(edge_path) and os.path.exists(node_path)) or \
             os.path.exists(graph_path):
             self.init_variables(edge_path, node_path, graph_path, negative_sample_rate)
+        self.color = [
+            "aliceblue","antiquewhite","aqua","aquamarine","azure","beige","bisque","black","blanchedalmond",
+            "blue","blueviolet","brown","burlywood","cadetblue","chartreuse","chocolate","coral","cornflowerblue",
+            "cornsilk","crimson","cyan","darkblue","darkcyan","darkgoldenrod",
+            "darkgray","darkgreen","darkkhaki","darkmagenta","darkolivegreen","darkorange",
+            "darkorchid","darkred","darksalmon","darkseagreen","darkslateblue","darkslategray",
+            "darkturquoise","darkviolet","deeppink","deepskyblue","dimgray","dodgerblue",
+            "firebrick","floralwhite","forestgreen","fuchsia","gainsboro","ghostwhite",
+            "gold","goldenrod","gray","green","greenyellow","honeydew","hotpink","indianred","indigo","ivory",
+            "khaki","lavender","lavenderblush","lawngreen","lemonchiffon","lightblue",
+            "lightcoral","lightcyan","lightgoldenrodyellow","lightgreen","lightgray","lightpink",
+            "lightsalmon","lightseagreen","lightskyblue","lightslategray","lightsteelblue","lightyellow",
+            "lime","limegreen","linen","magenta","maroon","mediumaquamarine",
+            "mediumblue","mediumorchid","mediumpurple","mediumseagreen","mediumslateblue","mediumspringgreen",
+            "mediumturquoise","mediumvioletred","midnightblue","mintcream","mistyrose",
+            "moccasin","navajowhite","navy","oldlace","olive",
+            "olivedrab","orange","orangered","orchid","palegoldenrod","palegreen",
+            "paleturquoise","palevioletred","papayawhip","peachpuff","peru","pink","plum","powderblue",
+            "purple","red","rosybrown","royalblue","saddlebrown","salmon","sandybrown","seagreen",
+            "seashell","sienna","silver","skyblue","slateblue","slategray","snow","springgreen",
+            "steelblue","tan","teal","thistle","tomato","turquoise","violet","wheat",
+            "white","whitesmoke","yellow","yellowgreen"]
+        
 
     def init_variables(self,edge_path, node_path, graph_path, negative_sample_rate):
         self.negative_sample_rate = negative_sample_rate
@@ -120,7 +145,7 @@ class Graph:
         self.start = self.end
         return mini_batch
     
-    def load_lable(self, label_path):
+    def load_label(self, label_path):
         self.label = numpy.zeros(self.node_number) -1
         with open(label_path,'r') as F:
             S = F.read().split("\n")
@@ -145,8 +170,32 @@ class Graph:
         pass
     def subgraph_explore(self, sample_rate):
         pass
-    def draw(self):
-        pass
+    
+    def draw(self, embedding_path, img_path):
+        embedding = io.loadmat(embedding_path)["embedding"]
+        classes = numpy.unique(self.label)
+        classes_number = classes.shape[0]
+
+        color = []
+        figure=pyplot.figure()
+        for i in range(classes_number):
+            index = numpy.argwhere(a=classes[i])
+            embedding_sub = embedding[index]
+            pyplot.scatter(embedding_sub[:,0], embedding_sub[:,1],c=random.choice(self.color))
+
+        min_embedding = numpy.min(embedding)
+        max_embedding = numpy.max(embedding)
+        if min_embedding < 0:
+            min_embedding = min_embedding * 1.2
+        else:
+            min_embedding = min_embedding * 0.8
+        if max_embedding < 0:
+            max_embedding = max_embedding * 0.8
+        else:
+            max_embedding = max_embedding * 1.2
+        pyplot.xlim(min_embedding, max_embedding)
+        pyplot.ylim(min_embedding, max_embedding)
+        figure.savefig(img_path,dpi=500)
 
 
 

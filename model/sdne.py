@@ -150,11 +150,11 @@ class SDNE:
         return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd +self.loss_xxx
 
     def save_model(self, path):
-        saver = tf.train.Saver()
+        saver = tf.train.Saver([self.w,self.b])
         saver.save(self.sess, path)
 
     def restore_model(self, path):
-        saver = tf.train.Saver()
+        saver = tf.train.Saver([self.w,self.b])
         saver.restore(self.sess, path)
         self.init = True
     
@@ -177,11 +177,13 @@ class SDNE:
                 rbms.append(rbm_unit)
                 for epoch in range(self.config.dbn_epochs):
                     error = 0
-                    for batch in range(0, data.node_number, self.config.dbn_batch_size):
+                    while True:
                         mini_batch = data.sample(self.config.dbn_batch_size).data
                         for k in range(len(rbms) - 1):
                             mini_batch = rbms[k].predict(mini_batch)
                         error += rbm_unit.fit(mini_batch)
+                        if data.epoch_end:
+                            break
                     self.logger("%d Layer: Rbm Epochs %3d Error: %5.6f"%(i,epoch,error))
 
                 W, bv, bh = rbm_unit.get_para()

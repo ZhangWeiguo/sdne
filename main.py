@@ -26,8 +26,7 @@ if __name__ == "__main__":
     if config.struct[0] == -1:
         config.struct[0] = graph.node_number
 
-    print(config.struct)
     model = SDNE(config, logger=logger.info)
-    # model.rbm_init(graph)
+    model.rbm_init(graph)
     model.train(graph)
     model.save_model(config.model_path)
