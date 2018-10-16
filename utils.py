@@ -30,7 +30,7 @@ graph = Graph(  edge_path=edge_path,
                 graph_path=graph_path)
 graph.load_label(config.label_path)
 
-
+graph.draw("data\\BlogCatalog\\data\\2d\\embedding.mat.50","groups.jpg")
 
 
 

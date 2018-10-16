@@ -1,3 +1,4 @@
+# -*- encoding:utf-8 -*-
 import numpy as np
 import tensorflow as tf
 import time
@@ -150,11 +151,11 @@ class SDNE:
         return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd +self.loss_xxx
 
     def save_model(self, path):
-        saver = tf.train.Saver([self.w,self.b])
+        saver = tf.train.Saver(self.w,self.b)
         saver.save(self.sess, path)
 
     def restore_model(self, path):
-        saver = tf.train.Saver([self.w,self.b])
+        saver = tf.train.Saver(self.w,self.b)
         saver.restore(self.sess, path)
         self.init = True
     

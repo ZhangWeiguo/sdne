@@ -175,12 +175,11 @@ class Graph:
         embedding = io.loadmat(embedding_path)["embedding"]
         classes = numpy.unique(self.label)
         classes_number = classes.shape[0]
-
         color = []
         figure=pyplot.figure()
         for i in range(classes_number):
-            index = numpy.argwhere(a=classes[i])
-            embedding_sub = embedding[index]
+            index = numpy.argwhere(self.label==classes[i])
+            embedding_sub = embedding[index.reshape((-1,))]
             pyplot.scatter(embedding_sub[:,0], embedding_sub[:,1],c=random.choice(self.color))
 
         min_embedding = numpy.min(embedding)
