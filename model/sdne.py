@@ -102,6 +102,12 @@ class SDNE:
         self.optimizer = tf.train.RMSPropOptimizer(config.learning_rate).minimize(self.loss)
         init = tf.global_variables_initializer()       
         self.sess.run(init)
+        try:
+            self.restore_model(self.config.model_path)
+            self.logger("Restore Model From %s Succ"%self.config.model_path)
+            self.init = True
+        except:
+            self.logger("Restore Model From %s Fail"%self.config.model_path)
         
 
     
@@ -164,38 +170,34 @@ class SDNE:
             op = a.assign(b)
             self.sess.run(op)
         self.logger("Init Para By RBM Model Begin")
-        if os.path.exists(self.config.model_path):
-            self.restore_model(self.config.model_path)
-            self.logger("Restore Model From " + self.config.model_path)
-        else:
-            shape = self.struct
-            rbms = []
-            for i in range(self.layers - 1):
-                rbm_unit = RBM(
-                    shape           = [shape[i], shape[i+1]], 
-                    batch_size      = self.config.dbn_batch_size, 
-                    learning_rate   = self.config.dbn_learning_rate)
-                rbms.append(rbm_unit)
-                for epoch in range(self.config.dbn_epochs):
-                    error = 0
-                    while True:
-                        mini_batch = data.sample(self.config.dbn_batch_size).data
-                        for k in range(len(rbms) - 1):
-                            mini_batch = rbms[k].predict(mini_batch)
-                        error_batch = rbm_unit.fit(mini_batch)
-                        error += error_batch
-                        if data.epoch_end:
-                            break
-                        self.logger("%d Layer: Rbm Epochs %3d Error: %5d/%5d %5.6f"%(i,epoch, data.start, data.node_number,error_batch))
-                    self.logger("%d Layer: Rbm Epochs %3d Error: %5.6f"%(i,epoch,error))
+        shape = self.struct
+        rbms = []
+        for i in range(self.layers - 1):
+            rbm_unit = RBM(
+                shape           = [shape[i], shape[i+1]], 
+                batch_size      = self.config.dbn_batch_size, 
+                learning_rate   = self.config.dbn_learning_rate)
+            rbms.append(rbm_unit)
+            for epoch in range(self.config.dbn_epochs):
+                error = 0
+                while True:
+                    mini_batch = data.sample(self.config.dbn_batch_size).data
+                    for k in range(len(rbms) - 1):
+                        mini_batch = rbms[k].predict(mini_batch)
+                    error_batch = rbm_unit.fit(mini_batch)
+                    error += error_batch
+                    if data.epoch_end:
+                        break
+                    self.logger("%d Layer: Rbm Epochs %3d Error: %5d/%5d %5.6f"%(i,epoch, data.start, data.node_number,error_batch))
+                self.logger("%d Layer: Rbm Epochs %3d Error: %5.6f"%(i,epoch,error))
 
-                W, bv, bh = rbm_unit.get_para()
-                name = "encoder" + str(i)
-                assign(self.w[name], W)
-                assign(self.b[name], bh)
-                name = "decoder" + str(self.layers - i - 2)
-                assign(self.w[name], W.transpose())
-                assign(self.b[name], bv)
+            W, bv, bh = rbm_unit.get_para()
+            name = "encoder" + str(i)
+            assign(self.w[name], W)
+            assign(self.b[name], bh)
+            name = "decoder" + str(self.layers - i - 2)
+            assign(self.w[name], W.transpose())
+            assign(self.b[name], bv)
         self.init = True
         self.logger("Init Para By RBM Model Done")
 
@@ -237,6 +239,7 @@ class SDNE:
                 model_path_epoch = model_path + ".%s"%str(current_epoch)
                 embedding_path_epoch = embedding_path + ".%s"%str(current_epoch)
                 self.save_model(model_path_epoch)
+                self.save_model(model_path)
 
                 loss = 0
                 while True:
