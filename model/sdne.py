@@ -229,7 +229,7 @@ class SDNE:
             loss += self.get_loss(mini_batch)
             if graph.epoch_end:
                 break
-        self.logger("SDNE Epoch %3d Error: (ALL) %5.6s"%(current_epoch, loss))
+        self.logger("SDNE Epoch %3d Error: (ALL) %5.6f"%(current_epoch, loss))
         while True:
             if current_epoch < self.config.epochs:
                 current_epoch += 1
@@ -239,7 +239,7 @@ class SDNE:
                     start = graph.start
                     mini_batch = graph.sample(batch_size)
                     loss = self.fit(mini_batch)
-                    self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6s"%(current_epoch, start, graph.node_number, loss))
+                    self.logger("SDNE Epoch %3d Error: %5d/%5d %5.6f"%(current_epoch, start, graph.node_number, loss))
                     if graph.epoch_end:
                         break
                 model_path_epoch = model_path + ".%s"%str(current_epoch)
@@ -258,7 +258,7 @@ class SDNE:
                     if graph.epoch_end:
                         break
                 io.savemat(embedding_path_epoch, {"embedding":embedding})
-                self.logger("SDNE Epoch %3d Error: (ALL) %5.6s"%(current_epoch, loss))
+                self.logger("SDNE Epoch %3d Error: (ALL) %5.6f"%(current_epoch, loss))
             else:
                 break
 
