@@ -142,7 +142,30 @@ class Graph:
         else:
             self.start += 1
         return mini_batch
-    
+
+    def sample_without_repeat(self, batch_size, shuffle=True, with_label = False):
+        if self.epoch_end:
+            if shuffle:
+                numpy.random.shuffle(self.order)
+            else:
+                self.order = numpy.sort(self.order)
+            self.start      = 0
+            self.epoch_end  = False
+        mini_batch                  = MiniBatch()
+        end = min(self.start + batch_size,self.node_number)
+        index                       = numpy.arange(self.start, end)
+        mini_batch.data             = self.adjacent_matrix[index].toarray()
+        mini_batch.adjacent_matrix  = self.adjacent_matrix[index].toarray()[:][:,index]
+        if with_label and self.label:
+            mini_batch.label = self.label[index]
+        if (self.start >= self.node_number-1):
+            self.epoch_end = True
+            self.start = 0
+        else:
+            self.start = end
+        return mini_batch
+
+
     def load_label(self, label_path):
         self.label = numpy.zeros(self.node_number) -1
         with open(label_path,'r') as F:

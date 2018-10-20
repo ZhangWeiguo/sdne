@@ -225,12 +225,8 @@ class SDNE:
         current_epoch    = 0
         loss = 0
         while True:
-            mini_batch = graph.sample(batch_size, shuffle=False)
+            mini_batch = graph.sample_without_repeat(batch_size, shuffle=False)
             loss += self.get_loss(mini_batch)
-            if embedding is None:
-                embedding = self.get_embedding(mini_batch)
-            else:
-                embedding = np.vstack((embedding, self.get_embedding(mini_batch)))
             if graph.epoch_end:
                 break
         self.logger("SDNE Epoch %3d Error: %5.6s"%(current_epoch, loss))
@@ -239,7 +235,6 @@ class SDNE:
                 current_epoch += 1
                 loss = 0
                 embedding = None
-
                 while True:
                     start = graph.start
                     mini_batch = graph.sample(batch_size)
@@ -254,7 +249,7 @@ class SDNE:
 
                 loss = 0
                 while True:
-                    mini_batch = graph.sample(batch_size, shuffle=False)
+                    mini_batch = graph.sample_without_repeat(batch_size, shuffle=False)
                     loss += self.get_loss(mini_batch)
                     if embedding is None:
                         embedding = self.get_embedding(mini_batch)
