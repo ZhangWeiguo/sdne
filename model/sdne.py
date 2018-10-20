@@ -229,7 +229,7 @@ class SDNE:
             loss += self.get_loss(mini_batch)
             if graph.epoch_end:
                 break
-        self.logger("SDNE Epoch %3d Error: %5.6s"%(current_epoch, loss))
+        self.logger("SDNE Epoch %3d Error: (ALL) %5.6s"%(current_epoch, loss))
         while True:
             if current_epoch < self.config.epochs:
                 current_epoch += 1
