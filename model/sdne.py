@@ -140,19 +140,15 @@ class SDNE:
         def get_2nd_loss(X, newX, beta):
             B = X * (beta - 1) + 1
             return tf.reduce_sum(tf.pow((newX - X)* B, 2))
-
-        def get_reg_loss(weight, biases):
-            ret = tf.add_n([tf.nn.l2_loss(w) for w in weight.itervalues()])
-            ret = ret + tf.add_n([tf.nn.l2_loss(b) for b in biases.itervalues()])
-            return ret
-            
-
         self.loss_2nd = get_2nd_loss(self.x, self.x_reconstruct, self.config.beta)
         self.loss_1st = get_1st_loss(self.h, self.adjacent_matrix)
-        # self.loss_xxx = tf.reduce_sum(tf.pow(self.x_reconstruct,2))
-        # we don't need the regularizer term, since we have nagetive sampling.
-        self.loss_reg = get_reg_loss(self.w, self.b) 
-        return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd + self.config.reg* self.loss_reg
+        loss = self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd
+        for wi in self.w:
+            if "encoder" in wi:
+                loss = tf.add(self.loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
+            elif "decoder" in wi:
+                loss = tf.add(self.loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
+        return loss
         
         # return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd +self.loss_xxx
 
