@@ -145,9 +145,9 @@ class SDNE:
         loss = self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd
         for wi in self.w:
             if "encoder" in wi:
-                loss = tf.add(self.loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
+                loss = tf.add(loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
             elif "decoder" in wi:
-                loss = tf.add(self.loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
+                loss = tf.add(loss, self.config.reg * tf.nn.l2_loss(self.w[wi]))
         return loss
         
         # return self.config.gamma * self.loss_1st + self.config.alpha * self.loss_2nd +self.loss_xxx
