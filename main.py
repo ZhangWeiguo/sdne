@@ -8,7 +8,7 @@ if __name__ == "__main__":
     logger = Logger("SDNE","sdne.log","None")
     logger.info("Config Begin")
     config = Config()
-    config.parse_from_inifile("config/Blogcatalog.ini")
+    config.parse_from_inifile("D:\\Code\\Python3\\sdne\\\config\\Blogcatalog.ini")
     logger.info("Config Done")
 
     edge_path   = config.edge_path
@@ -27,6 +27,6 @@ if __name__ == "__main__":
         config.struct[0] = graph.node_number
 
     model = SDNE(config, logger=logger.info)
-    model.rbm_init(graph)
+    # model.rbm_init(graph)
     model.train(graph)
     model.save_model(config.model_path)

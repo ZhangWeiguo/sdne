@@ -26,7 +26,6 @@ class Graph:
         self.order                  = None
         self.epoch_end              = False
         self.start                  = 0
-        self.end                    = 0
         self.label                  = None
         if logger == None:
             self.logger = default_logger
@@ -76,7 +75,6 @@ class Graph:
         self.order      = numpy.arange(self.node_number)
         self.epoch_end  = False
         self.start      = 0
-        self.end        = 0
         self.label      = None
 
     def __load_from_file(self, edge_path, node_path):
@@ -133,16 +131,16 @@ class Graph:
             self.start      = 0
             self.epoch_end  = False
         mini_batch                  = MiniBatch()
-        self.end                    = int(min(self.node_number, self.start + batch_size))
-        index                       = self.order[self.start:self.end]     
+        index                       = self.subgraph(index = self.start, size = batch_size)
         mini_batch.data             = self.adjacent_matrix[index].toarray()
         mini_batch.adjacent_matrix  = self.adjacent_matrix[index].toarray()[:][:,index]
         if with_label and self.label:
             mini_batch.label = self.label[index]
-        if (self.end == self.node_number):
-            self.end = 0
+        if (self.start >= self.node_number-1):
             self.epoch_end = True
-        self.start = self.end
+            self.start = 0
+        else:
+            self.start += 1
         return mini_batch
     
     def load_label(self, label_path):
@@ -156,20 +154,17 @@ class Graph:
                 y = int(y) - 1
                 self.label[x] = y
     
-    def subgraph(self, method="link", sample_rate = 0.01):
-        if method == "link":
-            return self.subgraph_link(sample_rate)
-        elif method == "node":
-            return self.subgraph_node(sample_rate)
-        else:
-            return self.subgraph_explore(sample_rate)
+    def subgraph(self, index, size):
+        t = [index]
+        while True:
+            t = self.adjacent_matrix[t,:].nonzero()[1]
+            if t.shape[0] >= size:
+                numpy.random.shuffle(t)
+                t = t[0:size]
+                break
+        return t
 
-    def subgraph_link(self, sample_rate):
-        pass
-    def subgraph_node(self, sample_rate):
-        pass
-    def subgraph_explore(self, sample_rate):
-        pass
+
     
     def draw(self, embedding_path, img_path):
         embedding = io.loadmat(embedding_path)["embedding"]

@@ -182,9 +182,11 @@ class SDNE:
                         mini_batch = data.sample(self.config.dbn_batch_size).data
                         for k in range(len(rbms) - 1):
                             mini_batch = rbms[k].predict(mini_batch)
-                        error += rbm_unit.fit(mini_batch)
+                        error_batch = rbm_unit.fit(mini_batch)
+                        error += error_batch
                         if data.epoch_end:
                             break
+                        self.logger("%d Layer: Rbm Epochs %3d Error: %5d/%5d %5.6f"%(i,epoch, data.start, data.node_number,error_batch))
                     self.logger("%d Layer: Rbm Epochs %3d Error: %5.6f"%(i,epoch,error))
 
                 W, bv, bh = rbm_unit.get_para()
