@@ -92,7 +92,6 @@ class Graph:
                 self.adjacent_matrix[x,y] = 1
                 self.adjacent_matrix[y,x] = 1
         self.edge_number = self.adjacent_matrix.count_nonzero()/2
-        self.__ngative_sample()
         self.adjacent_matrix.tocsr()
     
     def __save_to_mat(self, graph_path):
@@ -109,7 +108,7 @@ class Graph:
         self.edge_number        = data["edge_number"][0,0]
         self.node_number        = data["node_number"][0,0]
 
-    def __ngative_sample(self):
+    def __negative_sample(self):
         self.logger("Grap Negative Sampling Begin")
         size = 0
         while (size < int(self.negative_sample_rate*self.edge_number)):
